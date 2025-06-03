@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -14,33 +14,49 @@ model Users {
   email     String   @unique
   password  String
   name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Urls      Urls[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  role      Role     @default(USER)
+  urls      Urls[]
 
   @@index([email], name: "idx_users_email")
+  @@map("users")
 }
 
 model Urls {
-  id           String    @id @default(uuid())
-  originalUrl  String
-  shortenerUrl String
-  ownerId      String?
-  owner        Users?    @relation(fields: [ownerId], references: [id])
-  accesses     Int       @default(0)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  deletedAt    DateTime?
+  id            String    @id @default(uuid())
+  original_url  String
+  shortener_url String
+  owner_id      String?
+  owner         Users?    @relation(fields: [owner_id], references: [id])
+  accesses_qty  Int       @default(0)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deleted_at    DateTime?
+  active        Boolean   @default(true)
 
-  UrlAccesses UrlAccesses[]
+  previous_url_id String?
+  previous_url    Urls?   @relation("url_versioning", fields: [previous_url_id], references: [id])
+  next_versions   Urls[]  @relation("url_versioning")
 
-  @@index([shortenerUrl, ownerId], name: "idx_urls_shortenerUrl_ownerId")
-  @@index([originalUrl, ownerId], name: "idx_urls_originalUrl_originalUrl")
+  urls_accesses UrlsAccesses[]
+
+  @@index([shortener_url, owner_id], name: "idx_urls_shortener_url_owner_id")
+  @@index([original_url, owner_id], name: "idx_urls_original_url_original_url")
+  @@map("urls")
 }
 
-model UrlAccesses {
-  id         String   @id @default(uuid())
-  urlId      String
-  urls       Urls     @relation(fields: [urlId], references: [id])
-  accessedAt DateTime @default(now())
+model UrlsAccesses {
+  id          String   @id @default(uuid())
+  url_id      String
+  Urls        Urls     @relation(fields: [url_id], references: [id])
+  accessed_at DateTime @default(now())
+
+  @@index([url_id, accessed_at(Desc)], name: "idx_url_id_accesses_at")
+  @@map("urls_accesses")
+}
+
+enum Role {
+  USER
+  ADMIN
 }
