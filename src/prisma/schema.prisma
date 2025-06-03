@@ -9,15 +9,17 @@ datasource db {
 }
 
 model Users {
-  id        String   @id @default(uuid())
-  number    Int      @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  role      Role     @default(USER)
-  urls      Urls[]
+  id         String    @id @default(uuid())
+  number     Int       @default(autoincrement())
+  email      String    @unique
+  password   String
+  name       String?
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deleted_at DateTime?
+  active     Boolean   @default(true)
+  role       Role      @default(USER)
+  urls       Urls[]
 
   @@index([email], name: "idx_users_email")
   @@map("users")
