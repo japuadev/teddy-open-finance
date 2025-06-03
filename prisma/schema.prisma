@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id        String   @id @default(uuid())
+  number    Int      @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Urls      Urls[]
+
+  @@index([email], name: "idx_users_email")
+}
+
+model Urls {
+  id           String    @id @default(uuid())
+  originalUrl  String
+  shortenerUrl String
+  ownerId      String?
+  owner        Users?    @relation(fields: [ownerId], references: [id])
+  accesses     Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  UrlAccesses UrlAccesses[]
+
+  @@index([shortenerUrl, ownerId], name: "idx_urls_shortenerUrl_ownerId")
+  @@index([originalUrl, ownerId], name: "idx_urls_originalUrl_originalUrl")
+}
+
+model UrlAccesses {
+  id         String   @id @default(uuid())
+  urlId      String
+  urls       Urls     @relation(fields: [urlId], references: [id])
+  accessedAt DateTime @default(now())
+}
