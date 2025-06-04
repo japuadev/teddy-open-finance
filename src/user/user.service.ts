@@ -62,6 +62,7 @@ export class UserService {
           active: true,
         },
       });
+
       if (!existingUser) {
         throw new BadRequestException('Usuário não encontrado');
       }
@@ -94,6 +95,7 @@ export class UserService {
           active: true,
         },
       });
+
       if (!users || users.length === 0) {
         throw new BadRequestException('Nenhum usuário encontrado');
       }

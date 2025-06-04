@@ -2,6 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
 import { config } from 'dotenv';
+// import { AuthGuard } from './auth/auth.guard';
+// import { JwtService } from '@nestjs/jwt';
+// import { Reflector } from '@nestjs/core';
 
 async function bootstrap(): Promise<void> {
   config();
@@ -21,10 +24,15 @@ async function bootstrap(): Promise<void> {
     methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
     preflightContinue: false,
     optionsSuccessStatus: 204,
-    credentials: true,
   });
+
   app.setGlobalPrefix('api');
   app.useGlobalPipes();
+
+  // const jwtService = new JwtService();
+  // const reflector = new Reflector();
+
+  // app.useGlobalGuards(new AuthGuard(jwtService, reflector));
 
   await app.listen(process.env.PORT ?? 3000);
 }

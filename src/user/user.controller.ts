@@ -1,7 +1,8 @@
 import { Controller, Post, Body, Get, Request, Param, Put, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './interfaces/dto/create.user.dto';
-// import { UpdateUserDto } from './interfaces/dto/update.user.dto';'
+import { JwtPayload } from '../auth/interfaces/jwt.interface';
+import { UpdateUserDto } from './interfaces/dto/update.user.dto';
 
 @Controller('users')
 export class UserController {
@@ -12,26 +13,23 @@ export class UserController {
     return await this.userService.create(body);
   }
 
-  // @Get('/:id')
-  // async getUser(@Param('id') id: string, @Request() req: any) {
-  //   const userPayload = req.user;
-  //   return this.userService.getUserById(id, userPayload);
-  // }
+  @Get('/:id')
+  async getUser(@Param('id') id: string, @Request() req: { user: JwtPayload }) {
+    return this.userService.getUserById(id, req.user);
+  }
 
-  // @Get('/all')
-  // async getAllUsers(@Request() req: any) {
-  //   const userPayload = req.user;
-  //   return this.userService.getUserById(userPayload);
-  // }
+  @Get('/all')
+  async getAllUsers(@Request() req: JwtPayload) {
+    return this.userService.getAllUsers(req);
+  }
 
-  // @Put('/:id')
-  // async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto, @Request() req: any) {
-  //   const userPayload = req.user;
-  //   return this.userService.updateUser(id, body, userPayload);
-  // }
+  @Put('/:id')
+  async update(@Param('id') id: string, @Request() req: JwtPayload, @Body() body: UpdateUserDto) {
+    return this.userService.updateById(id, req, body);
+  }
 
-  // @Delete(':id')
-  // async softDelete(@Param('id', new ParseUUIDPipe()) id: string) {
-  //   return await this.userService.softDeleteUserById(id);
-  // }
+  @Delete(':id')
+  async softDelete(@Param('id') id: string, @Request() req: JwtPayload) {
+    return await this.userService.softDeleteUserById(id, req);
+  }
 }
