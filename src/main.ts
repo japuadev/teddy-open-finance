@@ -1,17 +1,18 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { config } from 'dotenv';
-// import { AuthGuard } from './auth/auth.guard';
-// import { JwtService } from '@nestjs/jwt';
-// import { Reflector } from '@nestjs/core';
 
 async function bootstrap(): Promise<void> {
   config();
   const app = await NestFactory.create(AppModule);
 
+  const reflector = app.get(Reflector);
+  app.useGlobalGuards(new JwtAuthGuard(reflector));
+
   const docsConfig = new DocumentBuilder()
-    .setTitle('Teddy Open Finance - URL SHORTENER API')
+    .setTitle('Teddy Open Shortener Url')
     .setDescription('API built to be URL shorteners for authenticated and unauthenticated users.')
     .setVersion('0.1.0')
     .addTag('documentation')
@@ -27,13 +28,6 @@ async function bootstrap(): Promise<void> {
   });
 
   app.setGlobalPrefix('api');
-  app.useGlobalPipes();
-
-  // const jwtService = new JwtService();
-  // const reflector = new Reflector();
-
-  // app.useGlobalGuards(new AuthGuard(jwtService, reflector));
-
   await app.listen(process.env.PORT ?? 3000);
 }
 

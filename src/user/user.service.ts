@@ -40,7 +40,7 @@ export class UserService {
         throw error;
       }
 
-      const errorMessage = typeof error === 'string' ? error : 'Internal server error';
+      const errorMessage = typeof error === 'string' ? error : 'Erro Interno do Servidor';
       throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -73,11 +73,12 @@ export class UserService {
 
       return existingUser;
     } catch (error) {
+      console.log('erro aqui', error);
       if (error instanceof HttpException) {
         throw error;
       }
 
-      const errorMessage = typeof error === 'string' ? error : 'Internal server error';
+      const errorMessage = typeof error === 'string' ? error : 'Erro Interno do Servidor';
       throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -106,7 +107,7 @@ export class UserService {
         throw error;
       }
 
-      const errorMessage = typeof error === 'string' ? error : 'Internal server error';
+      const errorMessage = typeof error === 'string' ? error : 'Erro Interno do Servidor';
       throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -145,7 +146,7 @@ export class UserService {
         throw error;
       }
 
-      const errorMessage = typeof error === 'string' ? error : 'Internal server error';
+      const errorMessage = typeof error === 'string' ? error : 'Erro Interno do Servidor';
       throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -176,7 +177,7 @@ export class UserService {
         throw error;
       }
 
-      const errorMessage = typeof error === 'string' ? error : 'Internal server error';
+      const errorMessage = typeof error === 'string' ? error : 'Erro Interno do Servidor';
       throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
