@@ -1,14 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import { IsString, IsNotEmpty, IsEmail, IsOptional, MinLength, MaxLength } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
+import { CreateUserDto } from './create-user.dto';
+import { IsString, IsOptional, IsEmail, MinLength, MaxLength } from 'class-validator';
 
-export class CreateUserDto {
+export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @IsEmail()
   email: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MinLength(6, {
     message: 'Pass is too short. Minimal length is $constraint1 characters.',
   })
@@ -21,7 +22,7 @@ export class CreateUserDto {
   @IsString()
   name?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   role: 'USER';
 }

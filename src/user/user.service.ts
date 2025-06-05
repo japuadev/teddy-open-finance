@@ -6,10 +6,10 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateUserDto } from './interfaces/dto/create.user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
 import { IUser } from './interfaces/user.interface';
 import * as bcrypt from 'bcrypt';
-import { UpdateUserDto } from './interfaces/dto/update.user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 import { DeletedResponse } from 'src/utils/response';
 import { constants } from 'src/utils/constants';
 
@@ -55,7 +55,7 @@ export class UserService {
     return user ?? undefined;
   }
 
-  async getUserById(id: string, userPayload: { id: string; role: string }): Promise<IUser> {
+  async findOneById(id: string, userPayload: { id: string; role: string }): Promise<IUser> {
     try {
       if (userPayload.id !== id && userPayload.role !== 'ADMIN') {
         throw new ForbiddenException('Você não tem permissão para visualizar este usuário');
@@ -84,7 +84,7 @@ export class UserService {
     }
   }
 
-  async getAllUsers(userPayload: { id: string; role: string }): Promise<IUser[]> {
+  async findAll(userPayload: { id: string; role: string }): Promise<IUser[]> {
     try {
       if (userPayload.role !== 'ADMIN') {
         throw new ForbiddenException('Você não tem permissão para visualizar todos os usuários');
@@ -112,7 +112,7 @@ export class UserService {
     }
   }
 
-  async updateById(
+  async update(
     id: string,
     userPayload: { id: string; role: string },
     updateDto: UpdateUserDto,
@@ -151,7 +151,7 @@ export class UserService {
     }
   }
 
-  async softDeleteUserById(
+  async softRemove(
     id: string,
     userPayload: { id: string; role: string },
   ): Promise<DeletedResponse> {

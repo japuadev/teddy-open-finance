@@ -1,7 +1,7 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { config } from 'dotenv';
 
 async function bootstrap(): Promise<void> {

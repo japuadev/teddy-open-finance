@@ -1,13 +1,8 @@
-export interface IUser {
-  id: string;
-  number: number;
+import { Users, Urls } from '@prisma/client';
+export interface IUser extends Users {
   email: string;
   password: string;
-  name?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date | null;
-  isActive?: boolean;
+  name: string | null;
   role: 'USER' | 'ADMIN';
-  //   urls?: Url[];
+  urls?: Urls[];
 }

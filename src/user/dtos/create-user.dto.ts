@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import { IsString, IsOptional, IsEmail, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, IsOptional, MinLength, MaxLength } from 'class-validator';
 
-export class UpdateUserDto {
+export class CreateUserDto {
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   @IsEmail()
   email: string;
 
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   @MinLength(6, {
     message: 'Pass is too short. Minimal length is $constraint1 characters.',
   })
@@ -21,7 +20,7 @@ export class UpdateUserDto {
   @IsString()
   name?: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   role: 'USER';
 }

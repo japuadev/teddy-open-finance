@@ -5,16 +5,16 @@ import {
   Get,
   Request,
   Param,
-  Put,
+  Patch,
   Delete,
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './interfaces/dto/create.user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
 import { JwtUser } from '../auth/interfaces/jwt-payload.interface';
-import { UpdateUserDto } from './interfaces/dto/update.user.dto';
-import { Public } from 'src/auth/public.decorator';
+import { UpdateUserDto } from './dtos/update-user.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('users')
 export class UserController {
@@ -29,29 +29,29 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @Get('/show-all')
-  async getAllUsers(@Request() req: { user: JwtUser }) {
-    return this.userService.getAllUsers(req.user);
+  async findAll(@Request() req: { user: JwtUser }) {
+    return this.userService.findAll(req.user);
   }
 
   @HttpCode(HttpStatus.OK)
   @Get('/:id')
-  async getUser(@Param('id') id: string, @Request() req: { user: JwtUser }) {
-    return this.userService.getUserById(id, req.user);
+  async findOneById(@Param('id') id: string, @Request() req: { user: JwtUser }) {
+    return this.userService.findOneById(id, req.user);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Put('/:id')
+  @Patch('/:id')
   async update(
     @Param('id') id: string,
     @Request() req: { user: JwtUser },
     @Body() body: UpdateUserDto,
   ) {
-    return this.userService.updateById(id, req.user, body);
+    return this.userService.update(id, req.user, body);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  async softDelete(@Param('id') id: string, @Request() req: { user: JwtUser }) {
-    return await this.userService.softDeleteUserById(id, req.user);
+  async remove(@Param('id') id: string, @Request() req: { user: JwtUser }) {
+    return await this.userService.softRemove(id, req.user);
   }
 }

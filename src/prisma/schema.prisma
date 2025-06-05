@@ -41,6 +41,8 @@ model Urls {
   next_versions   Urls[]         @relation("url_versioning")
   urls_accesses   UrlsAccesses[]
 
+  @@unique([original_url, owner_id], name: "uq_urls_original_per_owner")
+  @@unique([shortener_url], name: "uq_urls_shortener_url")
   @@index([shortener_url, owner_id], name: "idx_urls_shortener_url_owner_id")
   @@index([original_url, owner_id], name: "idx_urls_original_url_original_url")
   @@map("urls")
