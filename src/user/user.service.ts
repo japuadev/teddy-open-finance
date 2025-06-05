@@ -10,14 +10,16 @@ import { CreateUserDto } from './interfaces/dto/create.user.dto';
 import { IUser } from './interfaces/user.interface';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './interfaces/dto/update.user.dto';
+import { DeletedResponse } from 'src/utils/response';
+import { constants } from 'src/utils/constants';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
-  async create(data: CreateUserDto): Promise<IUser> {
+  async create(createDto: CreateUserDto): Promise<IUser> {
     try {
       const existingUser = await this.prisma.users.findUnique({
-        where: { email: data.email },
+        where: { email: createDto.email },
       });
 
       if (existingUser) {
@@ -25,14 +27,14 @@ export class UserService {
       }
 
       const salt = await bcrypt.genSalt(10);
-      data.password = await bcrypt.hash(data.password, salt);
+      createDto.password = await bcrypt.hash(createDto.password, salt);
 
       return await this.prisma.users.create({
         data: {
-          email: data.email,
-          password: data.password,
-          name: data.name,
-          role: data.role ?? 'USER',
+          email: createDto.email,
+          password: createDto.password,
+          name: createDto.name,
+          role: createDto.role ?? 'USER',
         },
       });
     } catch (error) {
@@ -50,11 +52,15 @@ export class UserService {
       where: { email },
     });
 
-    return user || undefined;
+    return user ?? undefined;
   }
 
   async getUserById(id: string, userPayload: { id: string; role: string }): Promise<IUser> {
     try {
+      if (userPayload.id !== id && userPayload.role !== 'ADMIN') {
+        throw new ForbiddenException('Você não tem permissão para visualizar este usuário');
+      }
+
       const existingUser = await this.prisma.users.findFirst({
         where: {
           id,
@@ -67,13 +73,8 @@ export class UserService {
         throw new BadRequestException('Usuário não encontrado');
       }
 
-      if (userPayload.id !== id && userPayload.role !== 'ADMIN') {
-        throw new ForbiddenException('Você não tem permissão para visualizar este usuário');
-      }
-
       return existingUser;
     } catch (error) {
-      console.log('erro aqui', error);
       if (error instanceof HttpException) {
         throw error;
       }
@@ -88,11 +89,10 @@ export class UserService {
       if (userPayload.role !== 'ADMIN') {
         throw new ForbiddenException('Você não tem permissão para visualizar todos os usuários');
       }
+
       const users = await this.prisma.users.findMany({
         where: {
-          deleted_at: {
-            not: null,
-          },
+          deleted_at: null,
           active: true,
         },
       });
@@ -115,30 +115,30 @@ export class UserService {
   async updateById(
     id: string,
     userPayload: { id: string; role: string },
-    data: UpdateUserDto,
+    updateDto: UpdateUserDto,
   ): Promise<IUser> {
     try {
-      const existingUser = await this.prisma.users.findUnique({
-        where: { id: id },
-      });
-
-      if (existingUser) {
-        throw new BadRequestException('Usuário não encontrado');
-      }
-
       if (userPayload.role !== 'ADMIN' && userPayload.id !== id) {
         throw new ForbiddenException('Você não tem permissão para atualizar este usuário');
       }
 
-      if (data?.password) {
+      const existingUser = await this.prisma.users.findFirst({
+        where: { id: id, deleted_at: null, active: true },
+      });
+
+      if (!existingUser) {
+        throw new BadRequestException('Usuário não encontrado');
+      }
+
+      if (updateDto?.password) {
         const salt = await bcrypt.genSalt(10);
-        data.password = await bcrypt.hash(data.password, salt);
+        updateDto.password = await bcrypt.hash(updateDto.password, salt);
       }
 
       return await this.prisma.users.update({
         where: { id: id },
         data: {
-          ...data,
+          ...updateDto,
         },
       });
     } catch (error) {
@@ -151,27 +151,32 @@ export class UserService {
     }
   }
 
-  async softDeleteUserById(id: string, userPayload: { id: string; role: string }): Promise<IUser> {
+  async softDeleteUserById(
+    id: string,
+    userPayload: { id: string; role: string },
+  ): Promise<DeletedResponse> {
     try {
-      const existingUser = await this.prisma.users.findUnique({
-        where: { id: id },
-      });
-
-      if (existingUser) {
-        throw new BadRequestException('Usuário não encontrado');
-      }
-
       if (userPayload.role !== 'ADMIN' && userPayload.id !== id) {
         throw new ForbiddenException('Você não tem permissão para atualizar este usuário');
       }
 
-      return await this.prisma.users.update({
+      const existingUser = await this.prisma.users.findFirst({
+        where: { id: id, deleted_at: null, active: true },
+      });
+
+      if (!existingUser) {
+        throw new BadRequestException('Usuário não encontrado ou já excluído');
+      }
+
+      await this.prisma.users.update({
         where: { id: id },
         data: {
           deleted_at: new Date(),
           active: false,
         },
       });
+
+      return new DeletedResponse(constants.DELETE);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

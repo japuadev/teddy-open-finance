@@ -14,8 +14,8 @@ export class AuthController {
     return this.authService.signIn(dto.email, dto.pass);
   }
 
-  // @Public()
-  @HttpCode(HttpStatus.OK)
+  @Public()
+  @HttpCode(HttpStatus.CREATED)
   @Post('/signup')
   signUp(@Body() body: CreateUserDto) {
     return this.authService.signUp(body);
