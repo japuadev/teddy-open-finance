@@ -9,6 +9,8 @@ import {
   HttpStatus,
   HttpCode,
   Request,
+  ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import { UrlService } from './url.service';
 import { CreateUrlDto } from './dtos/create-url.dto';
@@ -22,8 +24,8 @@ export class UrlController {
   constructor(private readonly urlService: UrlService) {}
 
   @Public()
-  @HttpCode(HttpStatus.CREATED)
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   create(@Body() createUrlDto: CreateUrlDto, @Request() req: ExpressRequest & { user?: JwtUser }) {
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     const user = req.user ?? undefined;
@@ -31,22 +33,32 @@ export class UrlController {
   }
 
   @Get()
-  findAll() {
-    return this.urlService.findAll();
+  @HttpCode(HttpStatus.OK)
+  findAll(@Request() req: { user: JwtUser }) {
+    return this.urlService.findAll(req.user);
+  }
+
+  @Get('shortenes')
+  @HttpCode(HttpStatus.OK)
+  findOriginalUrl(@Query('shortenerUrl') shortenerUrl: string, @Request() req: { user: JwtUser }) {
+    return this.urlService.findOriginalUrl(shortenerUrl, req.user);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @HttpCode(HttpStatus.OK)
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.urlService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUrlDto: UpdateUrlDto) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  update(@Param('id', new ParseUUIDPipe()) id: string, @Body() updateUrlDto: UpdateUrlDto) {
     return this.urlService.update(id, updateUrlDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.urlService.remove(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param('id', new ParseUUIDPipe()) id: string, @Request() req: { user: JwtUser }) {
+    return this.urlService.softRemove(id, req.user);
   }
 }
