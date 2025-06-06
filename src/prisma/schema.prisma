@@ -26,36 +26,25 @@ model Users {
 }
 
 model Urls {
-  id              String         @id @default(uuid())
+  id              String    @id @default(uuid())
   original_url    String
   shortener_url   String
   owner_id        String?
-  owner           Users?         @relation(fields: [owner_id], references: [id])
-  accesses_qty    Int            @default(0)
-  createdAt       DateTime       @default(now()) @map("created_at")
-  updatedAt       DateTime       @updatedAt @map("updated_at")
+  owner           Users?    @relation(fields: [owner_id], references: [id])
+  accesses_qty    Int       @default(0)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
   deleted_at      DateTime?
-  active          Boolean        @default(true)
+  active          Boolean   @default(true)
   previous_url_id String?
-  previous_url    Urls?          @relation("url_versioning", fields: [previous_url_id], references: [id])
-  next_versions   Urls[]         @relation("url_versioning")
-  urls_accesses   UrlsAccesses[]
+  previous_url    Urls?     @relation("url_versioning", fields: [previous_url_id], references: [id])
+  next_versions   Urls[]    @relation("url_versioning")
 
   @@unique([original_url, owner_id], name: "uq_urls_original_per_owner")
-  @@unique([shortener_url], name: "uq_urls_shortener_url")
+  @@unique([shortener_url, owner_id], name: "uq_urls_shortener_url")
   @@index([shortener_url, owner_id], name: "idx_urls_shortener_url_owner_id")
   @@index([original_url, owner_id], name: "idx_urls_original_url_original_url")
   @@map("urls")
-}
-
-model UrlsAccesses {
-  id          String   @id @default(uuid())
-  url_id      String
-  Urls        Urls     @relation(fields: [url_id], references: [id])
-  accessed_at DateTime @default(now())
-
-  @@index([url_id, accessed_at(Desc)], name: "idx_url_id_accesses_at")
-  @@map("urls_accesses")
 }
 
 enum Role {

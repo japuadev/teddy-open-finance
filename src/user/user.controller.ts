@@ -3,55 +3,58 @@ import {
   Post,
   Body,
   Get,
-  Request,
   Param,
   Patch,
   Delete,
   HttpStatus,
   HttpCode,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { JwtUser } from '../auth/interfaces/jwt-payload.interface';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { User } from 'src/auth/decorators/user.decorator';
+import { JwtUser } from 'src/auth/interfaces/jwt-payload.interface';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Public()
-  @HttpCode(HttpStatus.CREATED)
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   async create(@Body() body: CreateUserDto) {
-    return await this.userService.create(body);
+    return this.userService.create(body);
   }
 
+  @Get()
   @HttpCode(HttpStatus.OK)
-  @Get('/show-all')
-  async findAll(@Request() req: { user: JwtUser }) {
-    return this.userService.findAll(req.user);
+  async findAll(@User() user: JwtUser) {
+    return this.userService.findAll(user);
   }
 
+  @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @Get('/:id')
-  async findOneById(@Param('id') id: string, @Request() req: { user: JwtUser }) {
-    return this.userService.findOneById(id, req.user);
+  async findOneById(@Param('id', ParseUUIDPipe) id: string, @User() user: JwtUser) {
+    return this.userService.findOneById(id, user);
   }
 
+  @Patch(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Patch('/:id')
   async update(
-    @Param('id') id: string,
-    @Request() req: { user: JwtUser },
+    @Param('id', ParseUUIDPipe) id: string,
+    @User() user: JwtUser,
     @Body() body: UpdateUserDto,
-  ) {
-    return this.userService.update(id, req.user, body);
+  ): Promise<void> {
+    await this.userService.update(id, user, body);
   }
 
-  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  async remove(@Param('id') id: string, @Request() req: { user: JwtUser }) {
-    return await this.userService.softRemove(id, req.user);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id', ParseUUIDPipe) id: string, @User() user: JwtUser): Promise<void> {
+    await this.userService.softRemove(id, user);
   }
 }
