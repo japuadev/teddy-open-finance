@@ -10,8 +10,6 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { IUser } from './interfaces/user.interface';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { DeletedResponse } from 'src/utils/response';
-import { constants } from 'src/utils/constants';
 
 @Injectable()
 export class UserService {
@@ -119,7 +117,7 @@ export class UserService {
   ): Promise<IUser> {
     try {
       if (userPayload.role !== 'ADMIN' && userPayload.id !== id) {
-        throw new ForbiddenException('Você não tem permissão para atualizar este usuário');
+        throw new ForbiddenException('Você não tem permissão para atualizar este usuário.');
       }
 
       const existingUser = await this.prisma.users.findFirst({
@@ -127,7 +125,7 @@ export class UserService {
       });
 
       if (!existingUser) {
-        throw new BadRequestException('Usuário não encontrado');
+        throw new BadRequestException('Usuário não encontrado.');
       }
 
       if (updateDto?.password) {
@@ -151,10 +149,7 @@ export class UserService {
     }
   }
 
-  async softRemove(
-    id: string,
-    userPayload: { id: string; role: string },
-  ): Promise<DeletedResponse> {
+  async softRemove(id: string, userPayload: { id: string; role: string }): Promise<void> {
     try {
       if (userPayload.role !== 'ADMIN' && userPayload.id !== id) {
         throw new ForbiddenException('Você não tem permissão para atualizar este usuário');
@@ -175,8 +170,6 @@ export class UserService {
           active: false,
         },
       });
-
-      return new DeletedResponse(constants.DELETE);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

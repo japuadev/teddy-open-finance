@@ -4,6 +4,7 @@ import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/com
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { Request } from 'express';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -21,7 +22,12 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       context.getClass(),
     ]);
 
+    const request = context.switchToHttp().getRequest<Request>();
     const validUser = user === false ? undefined : user;
+
+    if (validUser) {
+      request.user = validUser;
+    }
 
     if (isPublic) {
       return validUser;

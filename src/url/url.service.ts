@@ -37,7 +37,11 @@ export class UrlService {
           data: { accesses_qty: { increment: 1 } },
         });
 
-        return { shortener_url: foundByOriginal.shortener_url };
+        return {
+          id: foundByOriginal.id,
+          shortener_url: foundByOriginal.shortener_url,
+          accesses_qty: foundByOriginal.accesses_qty,
+        };
       }
 
       let shortCode: string = '';
@@ -73,7 +77,11 @@ export class UrlService {
         },
       });
 
-      return { shortener_url: create.shortener_url };
+      return {
+        id: create.id,
+        shortener_url: create.shortener_url,
+        accesses_qty: create.accesses_qty,
+      };
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException('Erro ao criar a URL.');
@@ -144,7 +152,7 @@ export class UrlService {
   async findOriginalUrl(
     shortener_url: string,
     userPayload: { id: string; role: string },
-  ): Promise<{ original_url: string; quantity: number }> {
+  ): Promise<{ id: string; original_url: string; accesses_qty: number }> {
     try {
       const byShortener = await findActiveUrl(this.prisma, {
         shortener_url,
@@ -160,7 +168,11 @@ export class UrlService {
         data: { accesses_qty: { increment: 1 } },
       });
 
-      return { original_url: updatedUrl.original_url, quantity: updatedUrl.accesses_qty };
+      return {
+        id: updatedUrl.id,
+        original_url: updatedUrl.original_url,
+        accesses_qty: updatedUrl.accesses_qty,
+      };
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -187,7 +199,11 @@ export class UrlService {
       }
 
       if (existingUrl.original_url === updateDto.original_url) {
-        return { shortener_url: existingUrl.shortener_url };
+        return {
+          id: existingUrl.id,
+          shortener_url: existingUrl.shortener_url,
+          accesses_qty: existingUrl.accesses_qty,
+        };
       }
 
       await this.prisma.urls.update({
@@ -205,7 +221,15 @@ export class UrlService {
         existingUrl.id,
       );
 
-      return { shortener_url: created.shortener_url };
+      if (!created) {
+        throw new HttpException('Erro ao atualizar a URL.', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+
+      return {
+        id: created.id,
+        shortener_url: created.shortener_url,
+        accesses_qty: created.accesses_qty,
+      };
     } catch (error) {
       if (error instanceof HttpException) throw error;
 

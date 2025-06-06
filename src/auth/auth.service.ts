@@ -14,11 +14,15 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(email: string, pass: string) {
+  async signIn(email: string, passowrd: string) {
     const user = await this.prisma.users.findUnique({ where: { email } });
+    if (!user) {
+      throw new UnauthorizedException('Usuário ainda não tem cadastro.');
+    }
 
-    if (!user || !(await bcrypt.compare(pass, user.password))) {
-      throw new UnauthorizedException('Credenciais inválidas');
+    const validPass = await bcrypt.compare(passowrd, user.password);
+    if (!validPass) {
+      throw new UnauthorizedException('Credenciais inválidas.');
     }
 
     const payload = {
@@ -29,9 +33,9 @@ export class AuthService {
       },
     };
 
-    const access_token = this.jwtService.sign(payload);
+    const token = this.jwtService.sign(payload);
     return {
-      access_token,
+      token,
       user: payload.user,
     };
   }
