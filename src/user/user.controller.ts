@@ -1,6 +1,5 @@
 import {
   Controller,
-  Post,
   Body,
   Get,
   Param,
@@ -11,9 +10,7 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { Public } from 'src/auth/decorators/public.decorator';
 import { JWTPayload } from 'src/auth/decorators/jwt-payload.decorator';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiParam } from '@nestjs/swagger';
@@ -23,34 +20,6 @@ import { IUser } from './interfaces/user.interface';
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @Public()
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Cadastra usuário e retorna os dados desse usuário.' })
-  @ApiResponse({
-    status: 201,
-    description: 'Cadastro realizado com sucesso.',
-    schema: {
-      example: {
-        id: '5219dfad-d917...',
-        number: 3,
-        email: 'joao@teddy360.com.br',
-        password: '$2b$10$pq/WL69cyh6x9P...',
-        name: 'João Melo',
-        createdAt: '2025-06-05T23:22:32.220Z',
-        updatedAt: '2025-06-05T23:22:32.220Z',
-        deleted_at: null,
-        active: true,
-        role: 'ADMIN',
-      },
-    },
-  })
-  @ApiResponse({ status: 400, description: 'Erro ao criar usuário.' })
-  async create(@Body() createDto: CreateUserDto): Promise<IUser> {
-    return await this.userService.create(createDto);
-  }
-
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('bearer')
