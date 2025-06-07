@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   InternalServerErrorException,
   Injectable,
@@ -28,7 +26,7 @@ export class UrlService {
     try {
       const foundByOriginal = await findActiveUrl(this.prisma, {
         original_url: createDto.original_url,
-        owner_id: userPayload?.id ?? null,
+        owner_id: userPayload?.id ? userPayload.id : null,
       });
 
       if (foundByOriginal) {
@@ -83,57 +81,23 @@ export class UrlService {
         accesses_qty: create.accesses_qty,
       };
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw new InternalServerErrorException('Erro ao criar a URL.');
     }
   }
 
-  async findAll(
-    userPayload: { id: string; role: string },
-    type: 'me' | 'other' | 'both' = 'me',
-    active?: string,
-    deleted?: string,
-  ): Promise<IUrl[]> {
+  async findAll(userPayload: { id: string; role: string }): Promise<IUrl[]> {
     try {
-      const isAdmin = userPayload.role === 'ADMIN';
-      const safeType = isAdmin ? type : 'me';
-
-      if (userPayload.role !== 'ADMIN' && type !== 'me') {
-        throw new ForbiddenException(
-          'Usuários sem perfil ADMIN só podem acessar suas próprias URLs',
-        );
-      }
-
-      const where: any = {};
-
-      switch (safeType) {
-        case 'me':
-          where.owner_id = userPayload.id;
-          break;
-        case 'other':
-          where.OR = [{ owner_id: null }, { owner_id: { not: userPayload.id } }];
-          break;
-        case 'both':
-          break;
-      }
-
-      const activeBool = active === 'false' ? false : true;
-      const deletedBool = deleted === 'true' ? true : false;
-
-      if (isAdmin && active) {
-        where.active = activeBool;
-      } else if (!isAdmin) {
-        where.active = true;
-      }
-
-      if (isAdmin && deletedBool === true) {
-        where.deleted_at = { not: null };
-      } else if (!isAdmin || deletedBool === false) {
-        where.deleted_at = null;
+      if (!userPayload) {
+        throw new ForbiddenException('Apenas usuários logados podem ver as URLs.');
       }
 
       const urls = await this.prisma.urls.findMany({
-        where,
+        where: {
+          owner_id: userPayload.id,
+          active: true,
+          deleted_at: null,
+        },
         orderBy: { createdAt: 'desc' },
       });
 

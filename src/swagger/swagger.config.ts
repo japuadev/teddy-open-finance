@@ -13,10 +13,10 @@ export function setupSwagger(app: INestApplication): void {
         scheme: 'bearer',
         bearerFormat: 'JWT',
         in: 'header',
-        name: 'token',
+        name: 'Authorization',
         description: 'Cole o token JWT retornado no campo `token`, sem o prefixo Bearer.',
       },
-      'token',
+      'bearer',
     )
     .addSecurityRequirements('bearer')
     .build();

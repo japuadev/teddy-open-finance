@@ -15,12 +15,11 @@ import {
 import { UrlService } from './url.service';
 import { CreateUrlDto } from './dtos/create-url.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
-import { JwtUser } from 'src/auth/interfaces/jwt-payload.interface';
+import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 import { Request as ExpressRequest } from 'express';
-import { User } from 'src/auth/decorators/user.decorator';
+import { JWTPayload } from 'src/auth/decorators/jwt-payload.decorator';
 import { getBaseUrl } from 'src/utils/commons';
 import { IUrl } from './interfaces/url.interface';
-import { UrlQueryDto } from '../url/dtos/url-query.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -57,25 +56,17 @@ export class UrlController {
   create(
     @Body() createUrlDto: CreateUrlDto,
     @Request() req: ExpressRequest,
-    @User() user?: JwtUser,
+    @JWTPayload() payload?: JwtPayload,
   ): Promise<UrlResponseDto> {
     const baseUrl = getBaseUrl(req);
-    console.log(createUrlDto, user);
-    return this.urlService.create(createUrlDto, baseUrl, user);
+    return this.urlService.create(createUrlDto, baseUrl, payload?.user);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth('token')
+  @ApiBearerAuth('bearer')
   @ApiOperation({
-    summary:
-      'Retorna todas as URLs ativas de um usuário logado. Caso tenha permissão de ADMIN, pode retornar URLs desativas ou de outros usuários.',
-  })
-  @ApiQuery({
-    name: 'query',
-    type: UrlQueryDto,
-    description: 'Filtra URLs por tipo de usuário (USER/ADMIN), deletadas ou atualizadas.',
-    required: false,
+    summary: 'Retorna todas as URLs ativas de um usuário logado.',
   })
   @ApiResponse({
     status: 200,
@@ -111,14 +102,13 @@ export class UrlController {
     },
   })
   @ApiResponse({ status: 404, description: 'Nenhuma URL encontrada.' })
-  findAll(@User() user: JwtUser, @Query() query: UrlQueryDto): Promise<IUrl[]> {
-    const { type, active, deleted } = query;
-    return this.urlService.findAll(user, type, active, deleted);
+  findAll(@JWTPayload() payload: JwtPayload): Promise<IUrl[]> {
+    return this.urlService.findAll(payload.user);
   }
 
   @Get('resolve')
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth('token')
+  @ApiBearerAuth('bearer')
   @ApiOperation({
     summary: 'Retorna a URL original a partir da URL encurtada, por usuário.',
   })
@@ -142,14 +132,14 @@ export class UrlController {
   @ApiResponse({ status: 404, description: 'Nenhuma URL encontrada.' })
   findOriginalUrl(
     @Query('shortenerUrl') shortenerUrl: string,
-    @User() user: JwtUser,
+    @JWTPayload() payload: JwtPayload,
   ): Promise<UrlResponseDto> {
-    return this.urlService.findOriginalUrl(shortenerUrl, user);
+    return this.urlService.findOriginalUrl(shortenerUrl, payload.user);
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth('token')
+  @ApiBearerAuth('bearer')
   @ApiOperation({
     summary:
       'Cria nova URL a partir da edição da URL original para manter histórico e rastreabilidade das edições.',
@@ -158,7 +148,6 @@ export class UrlController {
     name: 'id',
     description: 'Id da URL cadastrada.',
     required: true,
-    type: ParseUUIDPipe,
   })
   @ApiResponse({
     status: 204,
@@ -169,13 +158,13 @@ export class UrlController {
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() createDto: CreateUrlDto,
-    @User() user: JwtUser,
+    @JWTPayload() payload: JwtPayload,
   ): Promise<UrlResponseDto> {
-    return this.urlService.update(id, createDto, user);
+    return this.urlService.update(id, createDto, payload.user);
   }
 
   @Delete(':id')
-  @ApiBearerAuth('token')
+  @ApiBearerAuth('bearer')
   @ApiOperation({
     summary: 'Deleta/Desativa uma URL através do ID.',
   })
@@ -183,14 +172,13 @@ export class UrlController {
     name: 'id',
     description: 'Id da URL cadastrada.',
     required: true,
-    type: ParseUUIDPipe,
   })
   @ApiResponse({
     status: 204,
   })
   @ApiResponse({ status: 500, description: 'Erro ao deletar a URL.' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string, @User() user: JwtUser): Promise<void> {
-    return this.urlService.softRemove(id, user);
+  remove(@Param('id', ParseUUIDPipe) id: string, @JWTPayload() payload: JwtPayload): Promise<void> {
+    return this.urlService.softRemove(id, payload.user);
   }
 }

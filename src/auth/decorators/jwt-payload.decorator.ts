@@ -2,7 +2,7 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtUser } from '../interfaces/jwt-payload.interface';
 
-export const User = createParamDecorator(
+export const JWTPayload = createParamDecorator(
   (data: keyof JwtUser | undefined, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest<Request>();
     const user = request.user as JwtUser;

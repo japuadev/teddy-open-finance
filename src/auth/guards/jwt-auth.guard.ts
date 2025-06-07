@@ -34,7 +34,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     }
 
     if (error || !validUser) {
-      throw error || new UnauthorizedException();
+      throw error || new UnauthorizedException('Erro nas credenciais. Faça login novamente.');
     }
 
     return validUser;

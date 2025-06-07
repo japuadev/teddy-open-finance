@@ -56,7 +56,7 @@ export class UserService {
   async findOneById(id: string, userPayload: { id: string; role: string }): Promise<IUser> {
     try {
       if (userPayload.id !== id && userPayload.role !== 'ADMIN') {
-        throw new ForbiddenException('Você não tem permissão para visualizar este usuário');
+        throw new ForbiddenException('Você não tem permissão para visualizar esse usuário.');
       }
 
       const existingUser = await this.prisma.users.findFirst({
@@ -68,7 +68,7 @@ export class UserService {
       });
 
       if (!existingUser) {
-        throw new BadRequestException('Usuário não encontrado');
+        throw new BadRequestException('Usuário não encontrado.');
       }
 
       return existingUser;
@@ -77,7 +77,7 @@ export class UserService {
         throw error;
       }
 
-      const errorMessage = typeof error === 'string' ? error : 'Erro Interno do Servidor';
+      const errorMessage = typeof error === 'string' ? error : 'Erro Interno do Servidor.';
       throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -85,7 +85,7 @@ export class UserService {
   async findAll(userPayload: { id: string; role: string }): Promise<IUser[]> {
     try {
       if (userPayload.role !== 'ADMIN') {
-        throw new ForbiddenException('Você não tem permissão para visualizar todos os usuários');
+        throw new ForbiddenException('Você não tem permissão para visualizar todos os usuários.');
       }
 
       const users = await this.prisma.users.findMany({
@@ -96,7 +96,7 @@ export class UserService {
       });
 
       if (!users || users.length === 0) {
-        throw new BadRequestException('Nenhum usuário encontrado');
+        throw new BadRequestException('Nenhum usuário encontrado.');
       }
 
       return users;
@@ -105,7 +105,7 @@ export class UserService {
         throw error;
       }
 
-      const errorMessage = typeof error === 'string' ? error : 'Erro Interno do Servidor';
+      const errorMessage = typeof error === 'string' ? error : 'Erro Interno do Servidor.';
       throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -116,8 +116,8 @@ export class UserService {
     updateDto: UpdateUserDto,
   ): Promise<IUser> {
     try {
-      if (userPayload.role !== 'ADMIN' && userPayload.id !== id) {
-        throw new ForbiddenException('Você não tem permissão para atualizar este usuário.');
+      if (userPayload.id !== id && userPayload.role !== 'ADMIN') {
+        throw new ForbiddenException('Você não tem permissão para atualizar esse usuário.');
       }
 
       const existingUser = await this.prisma.users.findFirst({
@@ -151,8 +151,8 @@ export class UserService {
 
   async softRemove(id: string, userPayload: { id: string; role: string }): Promise<void> {
     try {
-      if (userPayload.role !== 'ADMIN' && userPayload.id !== id) {
-        throw new ForbiddenException('Você não tem permissão para atualizar este usuário');
+      if (userPayload.id !== id && userPayload.role !== 'ADMIN') {
+        throw new ForbiddenException('Você não tem permissão para remover esse usuário.');
       }
 
       const existingUser = await this.prisma.users.findFirst({
@@ -160,7 +160,7 @@ export class UserService {
       });
 
       if (!existingUser) {
-        throw new BadRequestException('Usuário não encontrado ou já excluído');
+        throw new BadRequestException('Usuário não encontrado ou já removido.');
       }
 
       await this.prisma.users.update({

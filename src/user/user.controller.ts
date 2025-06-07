@@ -14,8 +14,8 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
-import { User } from 'src/auth/decorators/user.decorator';
-import { JwtUser } from 'src/auth/interfaces/jwt-payload.interface';
+import { JWTPayload } from 'src/auth/decorators/jwt-payload.decorator';
+import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { IUser } from './interfaces/user.interface';
 
@@ -53,7 +53,7 @@ export class UserController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth('token')
+  @ApiBearerAuth('bearer')
   @ApiOperation({ summary: 'Retorna todos os usuários cadastrados, se tiver permissão de ADMIN.' })
   @ApiResponse({
     status: 200,
@@ -89,13 +89,13 @@ export class UserController {
     },
   })
   @ApiResponse({ status: 200, description: 'Nenhum usuário não encontrado.' })
-  async findAll(@User() user: JwtUser): Promise<IUser[]> {
-    return await this.userService.findAll(user);
+  async findAll(@JWTPayload() payload: JwtPayload): Promise<IUser[]> {
+    return await this.userService.findAll(payload.user);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth('token')
+  @ApiBearerAuth('bearer')
   @ApiOperation({
     summary: 'Retorna o usuário pelo ID, caso seja o usuário logado ou tenha permissão de ADMIN.',
   })
@@ -103,7 +103,6 @@ export class UserController {
     name: 'id',
     description: 'Id do usuário cadastrado.',
     required: true,
-    type: ParseUUIDPipe,
   })
   @ApiResponse({
     status: 200,
@@ -124,13 +123,16 @@ export class UserController {
     },
   })
   @ApiResponse({ status: 200, description: 'Usuário não encontrado.' })
-  async findOneById(@Param('id', ParseUUIDPipe) id: string, @User() user: JwtUser): Promise<IUser> {
-    return await this.userService.findOneById(id, user);
+  async findOneById(
+    @Param('id', ParseUUIDPipe) id: string,
+    @JWTPayload() payload: JwtPayload,
+  ): Promise<IUser> {
+    return await this.userService.findOneById(id, payload.user);
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiBearerAuth('token')
+  @ApiBearerAuth('bearer')
   @ApiOperation({
     summary: 'Atualiza o usuário pelo ID, caso seja o usuário logado ou tenha permissão de ADMIN.',
   })
@@ -138,21 +140,20 @@ export class UserController {
     name: 'id',
     description: 'Id do usuário cadastrado.',
     required: true,
-    type: ParseUUIDPipe,
   })
   @ApiResponse({ status: 204 })
   @ApiResponse({ status: 200, description: 'Usuário não encontrado.' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @User() user: JwtUser,
-    @Body() body: UpdateUserDto,
+    @JWTPayload() payload: JwtPayload,
+    @Body() updateDto: UpdateUserDto,
   ): Promise<IUser> {
-    return await this.userService.update(id, user, body);
+    return await this.userService.update(id, payload.user, updateDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiBearerAuth('token')
+  @ApiBearerAuth('bearer')
   @ApiOperation({
     summary:
       'Desativa cadastro do usuário pelo ID, caso seja o usuário logado ou tenha permissão de ADMIN.',
@@ -161,11 +162,13 @@ export class UserController {
     name: 'id',
     description: 'Id do usuário cadastrado.',
     required: true,
-    type: ParseUUIDPipe,
   })
   @ApiResponse({ status: 204 })
   @ApiResponse({ status: 200, description: 'Usuário não encontrado.' })
-  async remove(@Param('id', ParseUUIDPipe) id: string, @User() user: JwtUser): Promise<void> {
-    await this.userService.softRemove(id, user);
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @JWTPayload() payload: JwtPayload,
+  ): Promise<void> {
+    await this.userService.softRemove(id, payload.user);
   }
 }

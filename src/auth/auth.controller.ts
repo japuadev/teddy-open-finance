@@ -4,6 +4,8 @@ import { CreateUserDto } from 'src/user/dtos/create-user.dto';
 import { SignInDto } from './dtos/sign-in.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { IUser } from 'src/user/interfaces/user.interface';
 
 @ApiTags('Autenticação')
 @Controller('auth')
@@ -33,7 +35,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 400, description: 'Erro ao criar usuário.' })
   @Post('/signup')
-  signUp(@Body() createDto: CreateUserDto) {
+  signUp(@Body() createDto: CreateUserDto): Promise<IUser> {
     return this.authService.signUp(createDto);
   }
 
@@ -56,7 +58,7 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 401, description: 'Credenciais inválidas.' })
-  signIn(@Body() signDto: SignInDto) {
+  signIn(@Body() signDto: SignInDto): Promise<JwtPayload> {
     return this.authService.signIn(signDto.email, signDto.password);
   }
 }

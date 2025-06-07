@@ -6,6 +6,7 @@ export interface JwtUser {
 
 export interface JwtPayload {
   user: JwtUser;
+  token?: string;
   iat?: number;
   exp?: number;
 }

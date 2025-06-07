@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { IUser } from 'src/user/interfaces/user.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(email: string, passowrd: string) {
+  async signIn(email: string, passowrd: string): Promise<JwtPayload> {
     const user = await this.prisma.users.findUnique({ where: { email } });
     if (!user) {
       throw new UnauthorizedException('Usuário ainda não tem cadastro.');
