@@ -43,10 +43,9 @@ npm install
 cp .env.example .env
 ```
 
-A aplicação contém usuário e senha padrão que estão disponibilizadas na documentação do swagger. Caso queira um banco de dados vazio, troque em .env "DATABASE_URL" o link do seu banco de dados ou siga os seguintes comandos, que limpará o banco de dados:
+A aplicação contém usuário e senha padrão que estão disponibilizadas na documentação do swagger. Caso queira um banco de dados vazio, troque em .env "DATABASE_URL" o link do seu banco de dados ou digite no terminal o seguinte comando, que limpará o banco de dados:
 
 ```bash
-cd src
 npx prisma migrate reset
 ```
 
