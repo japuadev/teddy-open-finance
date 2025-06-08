@@ -15,7 +15,7 @@ import {
 import { UrlService } from './url.service';
 import { CreateUrlDto } from './dtos/create-url.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
-import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
+import { IJwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 import { Request as ExpressRequest } from 'express';
 import { JWTPayload } from 'src/auth/decorators/jwt-payload.decorator';
 import { getBaseUrl } from 'src/utils/commons';
@@ -56,7 +56,7 @@ export class UrlController {
   create(
     @Body() createUrlDto: CreateUrlDto,
     @Request() req: ExpressRequest,
-    @JWTPayload() payload?: JwtPayload,
+    @JWTPayload() payload?: IJwtPayload,
   ): Promise<UrlResponseDto> {
     const baseUrl = getBaseUrl(req);
     return this.urlService.create(createUrlDto, baseUrl, payload?.user);
@@ -102,7 +102,7 @@ export class UrlController {
     },
   })
   @ApiResponse({ status: 404, description: 'Nenhuma URL encontrada.' })
-  findAll(@JWTPayload() payload: JwtPayload): Promise<IUrl[]> {
+  findAll(@JWTPayload() payload: IJwtPayload): Promise<IUrl[]> {
     return this.urlService.findAll(payload.user);
   }
 
@@ -132,7 +132,7 @@ export class UrlController {
   @ApiResponse({ status: 404, description: 'Nenhuma URL encontrada.' })
   findOriginalUrl(
     @Query('shortenerUrl') shortenerUrl: string,
-    @JWTPayload() payload: JwtPayload,
+    @JWTPayload() payload: IJwtPayload,
   ): Promise<UrlResponseDto> {
     return this.urlService.findOriginalUrl(shortenerUrl, payload.user);
   }
@@ -158,7 +158,7 @@ export class UrlController {
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() createDto: CreateUrlDto,
-    @JWTPayload() payload: JwtPayload,
+    @JWTPayload() payload: IJwtPayload,
   ): Promise<UrlResponseDto> {
     return this.urlService.update(id, createDto, payload.user);
   }
@@ -178,7 +178,10 @@ export class UrlController {
   })
   @ApiResponse({ status: 500, description: 'Erro ao deletar a URL.' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string, @JWTPayload() payload: JwtPayload): Promise<void> {
+  remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @JWTPayload() payload: IJwtPayload,
+  ): Promise<void> {
     return this.urlService.softRemove(id, payload.user);
   }
 }
