@@ -1,4 +1,4 @@
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'prisma/prisma.service';
 import { IUrl } from 'src/url/interfaces/url.interface';
 import { customAlphabet } from 'nanoid';
 import { Request } from 'express';

@@ -7,7 +7,7 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'prisma/prisma.service';
 import { CreateUrlDto } from './dtos/create-url.dto';
 import { IUrl } from './interfaces/url.interface';
 import { findActiveUrl, generateShortCode } from 'src/utils/commons';

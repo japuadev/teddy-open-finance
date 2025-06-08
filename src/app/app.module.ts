@@ -2,7 +2,7 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD, Reflector } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { UserModule } from '../user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
