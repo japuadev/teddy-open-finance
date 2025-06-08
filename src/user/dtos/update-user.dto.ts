@@ -1,43 +1,51 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateUserDto } from './create-user.dto';
-import { IsString, IsOptional, IsEmail, MinLength, MaxLength, IsIn } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEmail,
+  MinLength,
+  MaxLength,
+  IsEnum,
+  Matches,
+} from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {
-  @IsString()
+export class UpdateUserDto {
+  @IsEmail({}, { message: 'E-mail inválido.' })
   @IsOptional()
-  @IsEmail()
   @ApiPropertyOptional({ example: 'joao@teddy360.com.br' })
-  email: string;
+  email?: string;
 
   @IsString()
   @IsOptional()
   @MinLength(6, {
-    message: 'Senha esta muito curta. Tamanho mínimo é de $constraint1 caracteres.',
+    message: 'Senha muito curta. Mínimo de $constraint1 caracteres.',
   })
   @MaxLength(8, {
-    message: 'Senha esta muito longa. Tamanho máximo é $constraint1 caracteres.',
+    message: 'Senha muito longa. Máximo de $constraint1 caracteres.',
+  })
+  @Matches(/^(?=.*[a-zA-Z])(?=.*\d).+$/, {
+    message: 'A senha deve conter pelo menos uma letra e um número.',
   })
   @ApiPropertyOptional({
-    example: 'adivinha',
-    description: 'Senha do usuário (mín. 6, máx. 8 caracteres)',
+    example: 'adivinha360',
+    description: 'Senha do usuário (mín. 6, máx. 8 caracteres, com letras e números)',
     minLength: 6,
     maxLength: 8,
   })
-  password: string;
+  password?: string;
 
   @IsString()
   @IsOptional()
   @ApiPropertyOptional({ example: 'João Melo' })
-  name: string;
+  name?: string;
 
+  @IsEnum(Role, { message: 'Permissão deve ser USER ou ADMIN' })
   @IsOptional()
-  @IsString()
-  @IsIn(['USER', 'ADMIN'])
   @ApiPropertyOptional({
-    enum: ['USER', 'ADMIN'],
+    enum: Role,
     description: 'Tipo de acesso do usuário.',
-    default: 'USER',
+    default: Role.USER,
   })
-  role: 'USER';
+  role?: Role;
 }

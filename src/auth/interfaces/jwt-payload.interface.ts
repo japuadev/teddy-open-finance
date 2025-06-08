@@ -4,7 +4,7 @@ export interface JwtUser {
   role: string;
 }
 
-export interface JwtPayload {
+export interface IJwtPayload {
   user: JwtUser;
   token?: string;
   iat?: number;

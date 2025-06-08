@@ -1,4 +1,5 @@
 import { NestFactory, Reflector } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app/app.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { setupSwagger } from './swagger/swagger.config';
@@ -7,6 +8,14 @@ import { config } from 'dotenv';
 async function bootstrap(): Promise<void> {
   config();
   const app = await NestFactory.create(AppModule);
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   setupSwagger(app);
 

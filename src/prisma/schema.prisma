@@ -13,7 +13,7 @@ model Users {
   number     Int       @default(autoincrement())
   email      String    @unique
   password   String
-  name       String?
+  name       String
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime  @updatedAt @map("updated_at")
   deleted_at DateTime?

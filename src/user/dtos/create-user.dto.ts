@@ -1,24 +1,34 @@
-import { IsString, IsNotEmpty, IsEmail, MinLength, MaxLength, IsIn } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsEmail,
+  MinLength,
+  MaxLength,
+  IsEnum,
+  Matches,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 
 export class CreateUserDto {
-  @IsString()
-  @IsNotEmpty()
-  @IsEmail()
+  @IsEmail({}, { message: 'E-mail inválido.' })
   @ApiProperty({ example: 'joao@teddy360.com.br' })
   email: string;
 
   @IsString()
   @IsNotEmpty()
   @MinLength(6, {
-    message: 'Senha esta muito curta. Tamanho mínimo é de $constraint1 caracteres.',
+    message: 'Senha muito curta. Mínimo de $constraint1 caracteres.',
   })
-  @MaxLength(8, {
-    message: 'Senha esta muito longa. Tamanho máximo é $constraint1 caracteres.',
+  @MaxLength(12, {
+    message: 'Senha muito longa. Máximo de $constraint1 caracteres.',
+  })
+  @Matches(/^(?=.*[a-zA-Z])(?=.*\d).+$/, {
+    message: 'A senha deve conter pelo menos uma letra e um número.',
   })
   @ApiProperty({
-    example: 'adivinha',
-    description: 'Senha do usuário (mín. 6, máx. 8 caracteres)',
+    example: 'adivinha360',
+    description: 'Senha do usuário (mín. 6, máx. 8 caracteres, com letras e números)',
     minLength: 6,
     maxLength: 8,
   })
@@ -29,13 +39,11 @@ export class CreateUserDto {
   @ApiProperty({ example: 'João Melo' })
   name: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @IsIn(['USER', 'ADMIN'])
+  @IsEnum(Role, { message: 'Permissão deve ser USER ou ADMIN' })
   @ApiProperty({
-    enum: ['USER', 'ADMIN'],
+    enum: Role,
     description: 'Tipo de acesso do usuário.',
-    default: 'USER',
+    default: Role.USER,
   })
-  role: 'USER';
+  role: Role;
 }

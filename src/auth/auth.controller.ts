@@ -4,8 +4,9 @@ import { CreateUserDto } from 'src/user/dtos/create-user.dto';
 import { SignInDto } from './dtos/sign-in.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { IUser } from 'src/user/interfaces/user.interface';
+import { IJwtPayload } from './interfaces/jwt-payload.interface';
+import { ResponseUserDto } from 'src/user/dtos/response-user.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Autenticação')
 @Controller('auth')
@@ -16,27 +17,16 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Cadastra usuário e retorna os dados desse usuário.' })
   @ApiResponse({
-    status: 201,
-    description: 'Cadastro realizado com sucesso.',
-    schema: {
-      example: {
-        id: '5219dfad...',
-        number: 3,
-        email: 'joao@teddy360.com.br',
-        password: '$2b$10$pq/WL69cyh6x9P...',
-        name: 'João Melo',
-        createdAt: '2025-06-05T23:22:32.220Z',
-        updatedAt: '2025-06-05T23:22:32.220Z',
-        deleted_at: null,
-        active: true,
-        role: 'ADMIN',
-      },
-    },
+    type: ResponseUserDto,
   })
   @ApiResponse({ status: 400, description: 'Erro ao criar usuário.' })
   @Post('/signup')
-  signUp(@Body() createDto: CreateUserDto): Promise<IUser> {
-    return this.authService.signUp(createDto);
+  async signUp(@Body() createDto: CreateUserDto): Promise<ResponseUserDto> {
+    const user = await this.authService.signUp(createDto);
+
+    return plainToInstance(ResponseUserDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Public()
@@ -58,7 +48,7 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 401, description: 'Credenciais inválidas.' })
-  signIn(@Body() signDto: SignInDto): Promise<JwtPayload> {
+  signIn(@Body() signDto: SignInDto): Promise<IJwtPayload> {
     return this.authService.signIn(signDto.email, signDto.password);
   }
 }
