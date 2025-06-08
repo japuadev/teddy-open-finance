@@ -55,13 +55,13 @@ npx prisma migrate reset
 npm run start:dev
 ```
 
-A aplicação estará disponível em http://localhost:3001/api
+A aplicação estará disponível em: ➡️ http://localhost:3001/api
 
 ---
 
 ## 📚 Documentação da API (Swagger)
 
-A documentação completa está disponível em: http://localhost:3001/api/docs
+A documentação completa está disponível em: ➡️ http://localhost:3001/api/docs
 
 Lá você consegue:
 
