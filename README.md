@@ -43,10 +43,9 @@ npm install
 cp .env.example .env
 ```
 
-A aplicação contém usuário e senha padrão que estão disponibilizadas na documentação do swagger. Caso queira um banco de dados vazio, troque em .env "DATABASE_URL" o link do seu banco de dados ou siga os seguintes comandos, que limpará o banco de dados:
+A aplicação contém usuário e senha padrão que estão disponibilizadas na documentação do swagger. Caso queira um banco de dados vazio, troque em .env "DATABASE_URL" o link do seu banco de dados ou digite no terminal o seguinte comando, que limpará o banco de dados:
 
 ```bash
-cd src
 npx prisma migrate reset
 ```
 
@@ -72,31 +71,63 @@ Lá você consegue:
 
 ---
 
+## 🐳 Para subir aplicação no Docker:
+
+A aplicação está pronta para ser executada com o docker-compose.yaml que foi configurado para criar um backend NestJS e outro para o banco de dados PostgreSQL.
+
+✅ Pré-requisitos:
+
+- Docker e Docker Compose instalados
+- Arquivo .env criado a partir do .env.example
+
+```bash
+cp .env.example .env
+```
+
+### 🚀 Subindo o ambiente
+
+Execute o seguinte comando na raiz do projeto:
+
+```bash
+docker-compose up --build
+```
+
+Isso irá:
+
+- Construir a imagem da aplicação com Node.js
+- Instanciar o banco de dados PostgreSQL com as credenciais do docker-compose.yml
+- Aplicar automaticamente as migrations com Prisma
+- Iniciar o servidor na porta 3001
+
+A API estará acessível em: ➡️ http://localhost:3001/api
+A documentação Swagger: ➡️ http://localhost:3001/api/docs
+**O banco estará vazio.**
+
+---
+
 ### 🧪 Testes com Insomnia/Postman
 
-- O conjunto de rotas/coleções esta disponível **aqui**.
-- Melhorias sugeridas e pensadas ao longo do processo:
+- O conjunto de rotas/coleções esta disponível **[aqui]**(https://drive.google.com/file/d/1mca1O-RTueRFAM-RVkmNc3sgMDGXWsJ9/view).
+
+## 📌 Melhorias e Próximos passos:
 
 ### 📌 Regras de negócio:
 
-- Permitir reativar URLs deletadas se o slug for reutilizado
-- Histórico de edições com melhor visualização para o usuário
+- Permitir reativar URLs deletadas se o slug for reutilizado;
+- Histórico de edições com melhor visualização para o usuário;
+- Melhorr GET/urls com filtros;
+- Busca textual por domínios;
 
-### 🔍 Filtros e buscas:
+### 💡 System Desing:
 
-- Melhorr GET /urls com filtros:
-- URLs ativas/inativas;
-- Busca textual domínio;
-
-### 💡 Arquitetura e código
-
-- Melhorar tipagem das Promise<DTO> em todos os serviços
-- Unificar retornos com class-transformer -> @Exclude/@Expose
-- Aplicar DTOs também para respostas públicas (não só privadas)
-
-### 🔒 Segurança
-
-- Integração com captcha para usuários não autenticados
+- Fila de tarefas: implementação de mensageria assíncrona para desacoplar processos (ex: RabbitMQ);
+- Cache com Redis: melhorar a performance de leitura com cache de consultas e tokens;
+- Design de dados e APIs: revisar e refinar a modelagem das interfaces e DTOs;
+- Tolerância a falhas: implementar retries automáticos e circuit breakers;
+- Segurança: reforçar a proteção contra ataques (rate limit e validações profundas);
+- Monitoramento e observabilidade: integração com logs e métricas;
+- Orquestração e deploy: adotar pipelines de CI/CD com versionamento controlado e deploy contínuo;
+- Versionamento de API e serviços: aplicar versionamento eficiente para evitar breaking changes em ambientes produtivos.
 
 ### 📁 Estrutura principal do projeto:
 
