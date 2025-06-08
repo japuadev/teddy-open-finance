@@ -1,0 +1,3 @@
+echo "=================== RUNNING PRETTIER ==================="
+npm run format && npm run lint
+echo "============ PRETTIER SUCCESSFULLY EXECUTED ============"
