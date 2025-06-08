@@ -94,10 +94,10 @@ docker-compose up --build
 
 Isso irá:
 
-- Construir a imagem da aplicação com Node.js
-- Instanciar o banco de dados PostgreSQL com as credenciais do docker-compose.yml
-- Aplicar automaticamente as migrations com Prisma
-- Iniciar o servidor na porta 3001
+- Construir a imagem da aplicação com Node.js;
+- Instanciar o banco de dados PostgreSQL com as credenciais do docker-compose.yml;
+- Aplicar automaticamente as migrations com Prisma;
+- Iniciar o servidor na porta 3001.
 
 * A API estará acessível em: ➡️ http://localhost:3001/api
 
