@@ -106,6 +106,13 @@ Isso irá:
 
 ---
 
+## 📄 Histórico de versões
+
+- Confira as mudanças por versão: [CHANGELOG.md](./CHANGELOG.md)
+- Você também pode acessar: [Releases no GitHub](https://github.com/japuadev/teddy-open-finance/releases)
+
+---
+
 ### 🧪 Testes com Insomnia/Postman
 
 - O conjunto de rotas/coleções esta disponível **[aqui]**(https://drive.google.com/file/d/1mca1O-RTueRFAM-RVkmNc3sgMDGXWsJ9/view).
