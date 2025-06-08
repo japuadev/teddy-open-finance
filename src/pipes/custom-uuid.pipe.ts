@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 import { validate as isUUID } from 'uuid';
 
