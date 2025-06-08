@@ -99,9 +99,10 @@ Isso irá:
 - Aplicar automaticamente as migrations com Prisma
 - Iniciar o servidor na porta 3001
 
-A API estará acessível em: ➡️ http://localhost:3001/api
-A documentação Swagger: ➡️ http://localhost:3001/api/docs
-**O banco estará vazio.**
+* A API estará acessível em: ➡️ http://localhost:3001/api
+
+* A documentação Swagger: ➡️ http://localhost:3001/api/docs
+  **O banco estará vazio.**
 
 ---
 
