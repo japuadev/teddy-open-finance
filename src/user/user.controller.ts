@@ -1,20 +1,11 @@
-import {
-  Controller,
-  Body,
-  Get,
-  Param,
-  Patch,
-  Delete,
-  HttpStatus,
-  HttpCode,
-  ParseUUIDPipe,
-} from '@nestjs/common';
+import { Controller, Body, Get, Param, Patch, Delete, HttpStatus, HttpCode } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { JWTPayload } from 'src/auth/decorators/jwt-payload.decorator';
 import { IJwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { IUser } from './interfaces/user.interface';
+import { CustomUuidPipe } from 'src/pipes/custom-uuid.pipe';
 
 @ApiTags('Usuários')
 @Controller('users')
@@ -93,7 +84,7 @@ export class UserController {
   })
   @ApiResponse({ status: 200, description: 'Usuário não encontrado.' })
   async findOneById(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', CustomUuidPipe) id: string,
     @JWTPayload() payload: IJwtPayload,
   ): Promise<IUser> {
     return await this.userService.findOneById(id, payload.user);
@@ -113,7 +104,7 @@ export class UserController {
   @ApiResponse({ status: 204 })
   @ApiResponse({ status: 200, description: 'Usuário não encontrado.' })
   async update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', CustomUuidPipe) id: string,
     @JWTPayload() payload: IJwtPayload,
     @Body() updateDto: UpdateUserDto,
   ): Promise<IUser> {
@@ -135,7 +126,7 @@ export class UserController {
   @ApiResponse({ status: 204 })
   @ApiResponse({ status: 200, description: 'Usuário não encontrado.' })
   async remove(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', CustomUuidPipe) id: string,
     @JWTPayload() payload: IJwtPayload,
   ): Promise<void> {
     await this.userService.softRemove(id, payload.user);

@@ -9,7 +9,6 @@ import {
   HttpStatus,
   HttpCode,
   Request,
-  ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
 import { UrlService } from './url.service';
@@ -29,6 +28,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { UrlResponseDto } from './dtos/url-response.dto';
+import { CustomUuidPipe } from 'src/pipes/custom-uuid.pipe';
 
 @ApiTags('URLs')
 @Controller('urls')
@@ -156,7 +156,7 @@ export class UrlController {
   })
   @ApiResponse({ status: 500, description: 'Erro ao atualizar a URL.' })
   update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', CustomUuidPipe) id: string,
     @Body() createDto: CreateUrlDto,
     @JWTPayload() payload: IJwtPayload,
   ): Promise<UrlResponseDto> {
@@ -179,7 +179,7 @@ export class UrlController {
   @ApiResponse({ status: 500, description: 'Erro ao deletar a URL.' })
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', CustomUuidPipe) id: string,
     @JWTPayload() payload: IJwtPayload,
   ): Promise<void> {
     return this.urlService.softRemove(id, payload.user);
